@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { supabase } from '../lib/supabase.js';
-import { appendOtpRow } from '../lib/sheets.js'; // if used
+// import { appendOtpRow } from '../lib/sheets.js'; // if used
 import { sendToLeadSquared } from '../lib/leadsquared.js'; // ✅ Add this
 
 function generateOtp() {
