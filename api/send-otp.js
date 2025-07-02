@@ -1,17 +1,17 @@
 import axios from 'axios';
 import { supabase } from '../../lib/supabase.js';
 import { sendToLeadSquared } from '../../lib/leadsquared.js';
-// import { appendOtpRow } from '../../lib/sheets.js'; // Optional
+// import { appendOtpRow } from '../../lib/sheets.js'; // Optional if you use Google Sheets
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-// Growtel + DLT-approved credentials
-const GROWTEL_API_KEY = 'SZ5tXohW'; // replace with your actual key if needed
+// Growtel SMS credentials
+const GROWTEL_API_KEY = 'SZ5tXohW'; // Replace with actual key if needed
 const SENDER_ID = 'JaroEd';
 const ENTITY_ID = '1001696454968857192';
-const TEMPLATE_ID = '1007125343764448982'; // ← IFEEL - OTP template
+const TEMPLATE_ID = '1007125343764448982'; // IFEEL - OTP template
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   const otp = generateOtp();
   const timestamp = Date.now();
 
-  // 1. Store in Supabase
+  // 1. Store OTP in Supabase
   const { error } = await supabase.from('otps').upsert({
     phone: phoneNumber,
     otp,
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // 2. Send SMS via Growtel using the original DLT template
+  // 2. Send OTP via Growtel using IFEEL template
   const message = `Your OTP for accessing the Jaro Connect app is ${otp}. Explore career growth, alumni networking, and lifelong learning—all in one place.– Jaro Education`;
 
   try {
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Sync to LeadSquared
+    // 3. Sync phone to LeadSquared
     await sendToLeadSquared(phoneNumber);
 
     // 4. Optional: log to Google Sheet
